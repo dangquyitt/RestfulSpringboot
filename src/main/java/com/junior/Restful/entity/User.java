@@ -23,10 +23,9 @@ public class User {
     private String firstName;
     @Column(nullable = false, length = 50)
     private String lastName;
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String email;
-    @Column(nullable = false, length = 120, unique = true)
-    private String password;
+    @Column(nullable = false)
     private String encryptedPassword;
     private String emailVerificationToken;
     @Column(nullable = false)
