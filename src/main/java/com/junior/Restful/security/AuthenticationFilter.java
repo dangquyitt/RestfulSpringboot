@@ -1,10 +1,14 @@
 package com.junior.Restful.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.junior.Restful.model.dto.UserDTO;
 import com.junior.Restful.model.request.UserLoginRequestModel;
+import com.junior.Restful.service.UserService;
+import com.junior.Restful.service.UserServiceImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,12 +33,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         try {
-            UserLoginRequestModel creds = new ObjectMapper()
+            UserLoginRequestModel userLoginFromRequest = new ObjectMapper()
                     .readValue(request.getInputStream(), UserLoginRequestModel.class);
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            creds.getEmail(),
-                            creds.getPassword(),
+                            userLoginFromRequest.getEmail(),
+                            userLoginFromRequest.getPassword(),
                             new ArrayList<>()
                     )
             );
@@ -55,7 +59,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
         response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
+        UserDTO userDTO = userService.getUser(username);
+        response.addHeader("UserId", userDTO.getUserId());
     }
+
 
 
 }
