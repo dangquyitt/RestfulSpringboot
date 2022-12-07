@@ -5,11 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.ProviderManagerBuilder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,7 +33,7 @@ public class CustomSpringSecurity {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .addFilter(new AuthenticationFilter(authenticationManager));
+                .addFilter(getAuthenticationFilter(authenticationManager));
         return http.build();
     }
 
@@ -47,5 +43,10 @@ public class CustomSpringSecurity {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
+    }
+    public AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
+        AuthenticationFilter filter = new AuthenticationFilter(authenticationManager);
+        filter.setFilterProcessesUrl("/users/login");
+        return filter;
     }
 }
