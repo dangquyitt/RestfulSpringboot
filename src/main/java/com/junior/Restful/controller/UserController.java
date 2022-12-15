@@ -1,6 +1,5 @@
 package com.junior.Restful.controller;
 
-import com.junior.Restful.entity.User;
 import com.junior.Restful.model.dto.UserDTO;
 import com.junior.Restful.model.request.UserDetailsRequestModel;
 import com.junior.Restful.model.response.UserRest;
@@ -15,9 +14,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public String getUser() {
-        return "Get user was called";
+    @GetMapping(path = "/{id}")
+    public UserRest getUser(@PathVariable String id) {
+        UserRest returnValue = new UserRest();
+
+        UserDTO userDTO = userService.getUserByUserId(id);
+
+        BeanUtils.copyProperties(userDTO, returnValue);
+
+        return returnValue;
     }
 
     @PostMapping
