@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junior.Restful.model.dto.UserDTO;
 import com.junior.Restful.model.request.UserLoginRequestModel;
 import com.junior.Restful.service.UserService;
-import com.junior.Restful.service.UserServiceImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationContextAware;
+import lombok.Data;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,16 +16,20 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-@AllArgsConstructor
+@Data
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+        setFilterProcessesUrl("/users/login");
+    }
 
 
     @Override
@@ -50,7 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain,
-                                            Authentication authentication) throws IOException ,ServletException {
+                                            Authentication authentication)  {
         String username = ((User) authentication.getPrincipal()).getUsername();
 
         String token = Jwts.builder()
@@ -58,6 +61,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
+        System.out.println("token: " + token);
         response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
         UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
         UserDTO userDTO = userService.getUser(username);
