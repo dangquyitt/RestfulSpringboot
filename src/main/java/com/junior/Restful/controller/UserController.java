@@ -1,7 +1,9 @@
 package com.junior.Restful.controller;
 
+import com.junior.Restful.exception.UserServiceException;
 import com.junior.Restful.model.dto.UserDTO;
 import com.junior.Restful.model.request.UserDetailsRequestModel;
+import com.junior.Restful.model.response.ErrorMessages;
 import com.junior.Restful.model.response.UserRest;
 import com.junior.Restful.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -32,7 +34,7 @@ public class UserController {
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public UserRest  User(@RequestBody UserDetailsRequestModel userDetails) {
+    public UserRest  createUser(@RequestBody UserDetailsRequestModel userDetails) {
         UserRest returnValue = new UserRest();
 
         UserDTO userDTO = new UserDTO();
